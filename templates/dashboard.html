@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h2>Challenges</h2>
+  </div>
+
+  {% if challenges %}
+  <div class="accordion">
+    {% for challenge in challenges %}
+    {% set solved = challenge.id in solved_ids %}
+    <div class="accordion-item card challenge-card {{ 'solved' if solved }}" id="challenge-{{ challenge.id }}">
+      <button
+        class="accordion-trigger"
+        aria-expanded="false"
+        aria-controls="challenge-panel-{{ challenge.id }}"
+      >
+        <div class="challenge-summary">
+          <span class="challenge-title">{{ challenge.title }}</span>
+          <div class="challenge-meta">
+            {% if challenge.category %}
+            <span class="badge badge-category">{{ challenge.category }}</span>
+            {% endif %}
+            <span class="badge badge-points">{{ challenge.points }} pts</span>
+            <span class="badge badge-solved {{ 'visible' if solved }}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l3.5 3.5L12 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              SOLVED
+            </span>
+          </div>
+        </div>
+      </button>
+      <div class="accordion-panel" id="challenge-panel-{{ challenge.id }}" role="region">
+        <div class="panel-content">
+          <div class="challenge-description">{{ challenge.description }}</div>
+          {% if challenge.starting_points %}
+          <div class="starting-points">
+            <h4>Starting Points</h4>
+            <pre>{{ challenge.starting_points }}</pre>
+          </div>
+          {% endif %}
+          <form
+            class="flag-form"
+            method="POST"
+            action="{{ url_for('student.submit_flag', cid=challenge.id) }}"
+            data-challenge-id="{{ challenge.id }}"
+          >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="flag-input-row">
+              <input
+                type="text"
+                name="flag"
+                class="form-input flag-input"
+                placeholder="Enter flag..."
+                maxlength="512"
+                aria-label="Flag for {{ challenge.title }}"
+              >
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <span class="flag-feedback" aria-live="polite"></span>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>No challenges available yet. Check back later.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

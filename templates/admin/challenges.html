@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-page">
+  <div class="admin-header">
+    <h2>Challenges</h2>
+    <a href="{{ url_for('admin.challenge_new') }}" class="btn btn-primary">New Challenge</a>
+  </div>
+
+  {% if challenges %}
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Points</th>
+          <th>Active</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for challenge in challenges %}
+        <tr>
+          <td>{{ challenge.title }}</td>
+          <td>{{ challenge.category or '-' }}</td>
+          <td>{{ challenge.points }}</td>
+          <td>{{ 'Yes' if challenge.is_active else 'No' }}</td>
+          <td>{{ challenge.sort_order }}</td>
+          <td class="actions">
+            <a href="{{ url_for('admin.challenge_edit', cid=challenge.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            <form method="POST" action="{{ url_for('admin.challenge_delete', cid=challenge.id) }}" class="inline-form" onsubmit="return confirm('Delete this challenge? This cannot be undone.')">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No challenges created yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

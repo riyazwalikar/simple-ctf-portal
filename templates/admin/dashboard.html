@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-dashboard">
+  <h2>Admin Overview</h2>
+
+  <div class="stat-cards">
+    <div class="stat-card card">
+      <span class="stat-number">{{ user_count }}</span>
+      <span class="stat-label">Users</span>
+    </div>
+    <div class="stat-card card">
+      <span class="stat-number">{{ challenge_count }}</span>
+      <span class="stat-label">Challenges</span>
+    </div>
+    <div class="stat-card card">
+      <span class="stat-number">{{ solve_count }}</span>
+      <span class="stat-label">Solves</span>
+    </div>
+  </div>
+
+  <div class="admin-links">
+    <a href="{{ url_for('admin.challenges') }}" class="btn btn-secondary">Manage Challenges</a>
+    <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Manage Users</a>
+    <a href="{{ url_for('admin.settings') }}" class="btn btn-secondary">Settings</a>
+  </div>
+
+  <h3>Recent Submissions</h3>
+  {% if recent_submissions %}
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Challenge</th>
+          <th>Result</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in recent_submissions %}
+        <tr>
+          <td>{{ sub.user.username }}</td>
+          <td>{{ sub.challenge.title }}</td>
+          <td>
+            <span class="badge {{ 'badge-solved visible' if sub.is_correct else 'badge-incorrect' }}">
+              {{ 'Correct' if sub.is_correct else 'Incorrect' }}
+            </span>
+          </td>
+          <td class="muted">{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No submissions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
