@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, abort
 from config import Config
 from extensions import db, login_manager, csrf, limiter
 
@@ -9,6 +9,7 @@ def create_app():
 
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB (logo uploads)
 
     # ProxyFix when behind TLS reverse proxy
     if app.config["SESSION_COOKIE_SECURE"]:
@@ -40,10 +41,23 @@ def create_app():
 
     @app.context_processor
     def inject_helpers():
+        logo_filename = get_setting("logo_filename", "")
         return {
             "get_setting": get_setting,
             "user_score": user_score,
+            "logo_filename": logo_filename,
         }
+
+    @app.route("/logo")
+    def logo():
+        """Serve the admin-uploaded logo from the data directory."""
+        from flask import send_from_directory
+
+        filename = get_setting("logo_filename", "")
+        if not filename:
+            abort(404)
+        data_dir = os.path.join(app.root_path, "data")
+        return send_from_directory(data_dir, filename)
 
     # Register blueprints
     from blueprints.auth import auth_bp

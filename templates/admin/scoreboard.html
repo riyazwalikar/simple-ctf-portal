@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-page">
+  <div class="admin-header">
+    <h2>Scoreboard</h2>
+  </div>
+
+  <form method="GET" class="scoreboard-controls card">
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select name="category" id="category" class="form-input" onchange="this.form.submit()">
+        <option value="">All categories (total score)</option>
+        {% for cat in categories %}
+        <option value="{{ cat }}" {{ 'selected' if cat == selected_category }}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <input type="hidden" name="sort" value="{{ sort }}">
+  </form>
+
+  {% if rows %}
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>User</th>
+          <th>
+            {% if selected_category %}{{ selected_category }} pts{% else %}Total Score{% endif %}
+            {% if sort == 'desc' %}
+            <a href="{{ url_for('admin.scoreboard', sort='asc', category=selected_category) }}" class="sort-link" title="Sort ascending">&#9650;</a>
+            {% else %}
+            <a href="{{ url_for('admin.scoreboard', sort='desc', category=selected_category) }}" class="sort-link" title="Sort descending">&#9660;</a>
+            {% endif %}
+          </th>
+          {% if not selected_category %}
+          {% for cat in categories %}
+          <th>{{ cat }}</th>
+          {% endfor %}
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ row.display_name }}<span class="muted"> ({{ row.username }})</span></td>
+          <td>
+            {% if selected_category %}
+            {{ row.per_category[selected_category] }}
+            {% else %}
+            {{ row.total }}
+            {% endif %}
+          </td>
+          {% if not selected_category %}
+          {% for cat in categories %}
+          <td>{{ row.per_category.get(cat, 0) or '-' }}</td>
+          {% endfor %}
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">
+    {% if selected_category %}
+    No scores in {{ selected_category }} yet.
+    {% else %}
+    No students or no solves yet.
+    {% endif %}
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

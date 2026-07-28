@@ -95,6 +95,55 @@ h4 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--muted); }
   margin-top: 0.25rem;
 }
 
+.header-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+/* Auth pages: logo centered above the card */
+.auth-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-logo {
+  max-width: 220px;
+  max-height: 120px;
+  margin-bottom: 1.25rem;
+}
+
+.current-logo { margin-bottom: 0.5rem; }
+.current-logo-img {
+  max-width: 160px;
+  max-height: 80px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+/* Admin scoreboard controls */
+.scoreboard-controls {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+.scoreboard-controls .form-group { margin-bottom: 0; }
+
+.sort-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  margin-left: 0.375rem;
+}
+.sort-link:hover { color: var(--text); }
+
 .header-nav {
   display: flex;
   align-items: center;

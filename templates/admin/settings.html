@@ -2,7 +2,7 @@
 {% block content %}
 <div class="form-page">
   <h2>Settings</h2>
-  <form method="POST" class="admin-form card">
+  <form method="POST" class="admin-form card" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
     <div class="form-group">
@@ -19,6 +19,35 @@
       {% for error in form.portal_subtitle.errors %}
       <span class="form-error">{{ error }}</span>
       {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.footer_text.label }}
+      {{ form.footer_text(class="form-input") }}
+      <span class="form-hint">Shown in the bottom pane on every page.</span>
+      {% for error in form.footer_text.errors %}
+      <span class="form-error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.logo.label }}
+      {% if logo_filename %}
+      <div class="current-logo">
+        <img src="{{ url_for('logo') }}" alt="Current logo" class="current-logo-img">
+      </div>
+      {% endif %}
+      {{ form.logo(class="form-input", accept=".png,.jpg,.jpeg,.gif,.webp") }}
+      <span class="form-hint">Shown above the login/register forms and in the header. Leave blank to keep the current logo.</span>
+      {% for error in form.logo.errors %}
+      <span class="form-error">{{ error }}</span>
+      {% endfor %}
+      {% if logo_filename %}
+      <div class="form-group form-checkbox">
+        {{ form.remove_logo(class="form-checkbox-input") }}
+        {{ form.remove_logo.label }}
+      </div>
+      {% endif %}
     </div>
 
     <div class="form-row">

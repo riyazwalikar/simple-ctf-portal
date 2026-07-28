@@ -58,7 +58,9 @@ From the web UI: `/admin/settings` → **Danger Zone → Reset Portal to Default
 - Async flag submission (no page reload) with a full no-JS form fallback
 - Derived scoring — points counted once per solved challenge, no double-counting
 - Optional scoreboard (admin-toggled) ranked by score, then earliest last-solve
-- Runtime-editable branding (title/subtitle) and registration toggle/code
+- Admin scoreboard with per-category breakdown, total-score sorting, and category filter for top scorers
+- Runtime-editable branding: title, subtitle, footer text, and logo upload (PNG/JPEG/GIF/WebP, magic-byte validated, SVG rejected as XSS risk)
+- Registration toggle and optional registration code
 - One-click reset to defaults from the admin UI
 - Dark, terminal-adjacent theme; responsive to ~360px; keyboard-accessible accordion; `prefers-reduced-motion` respected
 

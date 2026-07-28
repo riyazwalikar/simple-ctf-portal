@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="auth-page">
-  <div class="auth-card card">
+  <div class="auth-inner">
+    {% if logo_filename %}
+    <img src="{{ url_for('logo') }}" alt="Portal logo" class="auth-logo">
+    {% endif %}
+    <div class="auth-card card">
     <h2>Register</h2>
     <form method="POST" class="auth-form">
       {{ form.hidden_tag() }}
@@ -54,6 +58,7 @@
     <p class="auth-alt">
       Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
     </p>
+    </div>
   </div>
 </div>
 {% endblock %}

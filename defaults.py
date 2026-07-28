@@ -9,6 +9,8 @@ DEFAULT_SETTINGS = {
     "registration_open": "true",
     "registration_code": "",
     "scoreboard_enabled": "false",
+    "footer_text": "Build Break Repeat",
+    "logo_filename": "",
 }
 
 SAMPLE_CHALLENGES = [

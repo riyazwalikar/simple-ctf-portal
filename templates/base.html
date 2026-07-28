@@ -10,6 +10,9 @@
   <header class="site-header">
     <div class="header-inner{{ ' header-inner-guest' if not current_user.is_authenticated }}">
       <div class="header-brand">
+        {% if current_user.is_authenticated and logo_filename %}
+        <img src="{{ url_for('logo') }}" alt="Portal logo" class="header-logo">
+        {% endif %}
         <h1 class="portal-title">{{ get_setting('portal_title', 'Exam and CTF Portal') }}</h1>
         <p class="portal-subtitle">{{ get_setting('portal_subtitle', '') }}</p>
       </div>
@@ -47,7 +50,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>Build Break Repeat</p>
+    <p>{{ get_setting('footer_text', 'Build Break Repeat') }}</p>
   </footer>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>

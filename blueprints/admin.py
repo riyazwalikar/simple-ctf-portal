@@ -1,5 +1,8 @@
+import os
+
 from flask import (
     Blueprint,
+    current_app,
     render_template,
     request,
     redirect,
@@ -8,6 +11,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from sqlalchemy.exc import IntegrityError
 from wtforms import (
     StringField,
@@ -22,7 +26,14 @@ from werkzeug.security import generate_password_hash
 from defaults import DEFAULT_SETTINGS, SAMPLE_CHALLENGES
 from models import User, Challenge, Submission
 from extensions import db
-from utils import admin_required, get_setting, set_setting, user_score
+from utils import (
+    admin_required,
+    get_setting,
+    set_setting,
+    user_score,
+    save_logo,
+    remove_logo,
+)
 from sqlalchemy import desc, func
 
 admin_bp = Blueprint("admin", __name__)
@@ -75,6 +86,9 @@ class UserResetPasswordForm(FlaskForm):
 class SettingsForm(FlaskForm):
     portal_title = StringField("Portal Title", validators=[DataRequired(), Length(max=255)])
     portal_subtitle = StringField("Portal Subtitle", validators=[Optional(), Length(max=255)])
+    footer_text = StringField("Footer Text", validators=[Optional(), Length(max=255)])
+    logo = FileField("Logo (PNG, JPEG, GIF, WebP; max 2MB)", validators=[Optional()])
+    remove_logo = BooleanField("Remove current logo")
     registration_open = BooleanField("Registration Open")
     registration_code = StringField("Registration Code", validators=[Optional(), Length(max=64)])
     scoreboard_enabled = BooleanField("Scoreboard Enabled")
@@ -302,11 +316,25 @@ def settings():
     if form.validate_on_submit():
         set_setting("portal_title", form.portal_title.data)
         set_setting("portal_subtitle", form.portal_subtitle.data)
+        set_setting("footer_text", form.footer_text.data or "")
         set_setting("registration_open", "true" if form.registration_open.data else "false")
         set_setting("registration_code", form.registration_code.data or "")
         set_setting(
             "scoreboard_enabled", "true" if form.scoreboard_enabled.data else "false"
         )
+
+        data_dir = os.path.join(current_app.root_path, "data")
+        if form.remove_logo.data:
+            remove_logo(data_dir)
+            set_setting("logo_filename", "")
+        elif form.logo.data:
+            try:
+                filename = save_logo(form.logo.data, data_dir)
+                set_setting("logo_filename", filename)
+            except ValueError as e:
+                flash(str(e), "error")
+                return redirect(url_for("admin.settings"))
+
         flash("Settings saved.", "success")
         return redirect(url_for("admin.settings"))
 
@@ -316,6 +344,7 @@ def settings():
             "portal_title", "Exam and CTF Portal"
         )
         form.portal_subtitle.data = get_setting("portal_subtitle", "")
+        form.footer_text.data = get_setting("footer_text", "Build Break Repeat")
         form.registration_open.data = get_setting("registration_open", "true") == "true"
         form.registration_code.data = get_setting("registration_code", "")
         form.scoreboard_enabled.data = (
@@ -323,6 +352,71 @@ def settings():
         )
 
     return render_template("admin/settings.html", form=form)
+
+
+# ---------------------------------------------------------------------------
+# Scoreboard (admin view: totals + per-category top scorers)
+# ---------------------------------------------------------------------------
+
+@admin_bp.route("/scoreboard")
+@admin_required
+def scoreboard():
+    sort = request.args.get("sort", "desc")
+    if sort not in ("asc", "desc"):
+        sort = "desc"
+    selected_category = request.args.get("category", "")
+
+    categories = [
+        row[0]
+        for row in db.session.query(Challenge.category).distinct().all()
+        if row[0]
+    ]
+    categories.sort()
+
+    students = User.query.filter_by(role="student").order_by(User.id).all()
+    rows = []
+    for u in students:
+        # Distinct solved challenges for this user
+        solved = (
+            Challenge.query.join(Submission, Submission.challenge_id == Challenge.id)
+            .filter(
+                Submission.user_id == u.id,
+                Submission.is_correct == True,  # noqa: E712
+            )
+            .group_by(Challenge.id)
+            .all()
+        )
+        per_category = {}
+        for chal in solved:
+            key = chal.category or "Uncategorized"
+            per_category[key] = per_category.get(key, 0) + chal.points
+        total = sum(per_category.values())
+        rows.append(
+            {
+                "username": u.username,
+                "display_name": u.display_name or u.username,
+                "total": total,
+                "per_category": per_category,
+            }
+        )
+
+    if selected_category:
+        # Top scorers in one category: only users with points there
+        rows = [r for r in rows if r["per_category"].get(selected_category, 0) > 0]
+        rows.sort(
+            key=lambda r: r["per_category"][selected_category],
+            reverse=(sort == "desc"),
+        )
+    else:
+        rows.sort(key=lambda r: r["total"], reverse=(sort == "desc"))
+
+    return render_template(
+        "admin/scoreboard.html",
+        rows=rows,
+        categories=categories,
+        selected_category=selected_category,
+        sort=sort,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -341,6 +435,8 @@ def reset_portal():
 
     for key, value in DEFAULT_SETTINGS.items():
         set_setting(key, value)
+
+    remove_logo(os.path.join(current_app.root_path, "data"))
 
     for data in SAMPLE_CHALLENGES:
         db.session.add(Challenge(**data))

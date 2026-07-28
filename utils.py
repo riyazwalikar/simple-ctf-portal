@@ -1,10 +1,58 @@
 import hmac
+import os
 from functools import wraps
 from flask import abort
 from flask_login import current_user
 from sqlalchemy import func, select
 from models import Setting, Submission, Challenge
 from extensions import db
+
+# Logo upload: raster formats only. SVG is deliberately excluded — it can
+# carry script and would be a stored-XSS vector when served back.
+LOGO_MAGIC = {
+    b"\x89PNG\r\n\x1a\n": ".png",
+    b"\xff\xd8\xff": ".jpg",
+    b"GIF87a": ".gif",
+    b"GIF89a": ".gif",
+    b"RIFF": ".webp",  # refined below (RIFF....WEBP)
+}
+
+
+def sniff_logo_ext(data):
+    """Return the allowed extension for *data* by magic bytes, else None."""
+    for magic, ext in LOGO_MAGIC.items():
+        if data.startswith(magic):
+            if ext == ".webp" and data[8:12] != b"WEBP":
+                return None
+            return ext
+    return None
+
+
+def save_logo(file_storage, data_dir):
+    """Validate and persist an uploaded logo. Returns the saved filename.
+
+    Raises ValueError on bad content. Overwrites any previous logo."""
+    head = file_storage.read(16)
+    file_storage.seek(0)
+    ext = sniff_logo_ext(head)
+    if ext is None:
+        raise ValueError("Logo must be a PNG, JPEG, GIF, or WebP image.")
+    # Remove old logos (any allowed extension)
+    for old_ext in (".png", ".jpg", ".gif", ".webp"):
+        old = os.path.join(data_dir, f"logo{old_ext}")
+        if os.path.exists(old):
+            os.remove(old)
+    filename = f"logo{ext}"
+    file_storage.save(os.path.join(data_dir, filename))
+    return filename
+
+
+def remove_logo(data_dir):
+    """Delete any stored logo file."""
+    for ext in (".png", ".jpg", ".gif", ".webp"):
+        path = os.path.join(data_dir, f"logo{ext}")
+        if os.path.exists(path):
+            os.remove(path)
 
 
 def admin_required(f):
