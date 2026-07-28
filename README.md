@@ -93,4 +93,4 @@ From the web UI: `/admin/settings` → **Danger Zone → Reset Portal to Default
 
 ## License
 
-Build Break Repeat.
+MIT — see [LICENSE](LICENSE). Build Break Repeat.
