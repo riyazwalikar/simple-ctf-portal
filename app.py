@@ -62,6 +62,15 @@ def create_app():
         _os.makedirs(data_dir, exist_ok=True)
         db.create_all()
 
+        # First-boot auto-seed: if no admin exists (fresh deploy, seed.py
+        # never run), bootstrap admin + settings + sample challenges.
+        # Idempotent — seed() skips anything that already exists.
+        if not User.query.filter_by(role="admin").first():
+            from seed import seed
+
+            seed(app)
+            print("First boot: no admin user found — seeded admin, settings, sample challenges.")
+
     return app
 
 

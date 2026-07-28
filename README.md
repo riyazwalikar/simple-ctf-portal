@@ -17,6 +17,12 @@ python app.py
 
 App serves on `0.0.0.0:5000` (set `PORT` env to override).
 
+## Deploying (Railway, etc.)
+
+- Set env vars: `SECRET_KEY`, `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`. Optional: `SESSION_COOKIE_SECURE=true` (TLS), `DATABASE_URL`.
+- **First boot auto-seeds**: if no admin user exists, the app creates the admin (from env), default settings, and sample challenges automatically. `python seed.py` is only needed locally.
+- **SQLite is ephemeral in containers.** Without a persistent volume, every redeploy/restart wipes the database. On Railway: add a Volume mounted at `/app/data` (the default `DATABASE_URL` resolves there). Change `DATABASE_URL` if your mount path differs.
+
 ## Reset Everything
 
 From the shell:

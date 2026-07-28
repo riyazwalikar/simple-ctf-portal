@@ -14,10 +14,8 @@ from extensions import db
 from models import User, Challenge, Setting
 from werkzeug.security import generate_password_hash
 
-app = create_app()
 
-
-def seed():
+def seed(app):
     with app.app_context():
         db.create_all()
 
@@ -63,4 +61,4 @@ def seed():
 
 
 if __name__ == "__main__":
-    seed()
+    seed(create_app())
