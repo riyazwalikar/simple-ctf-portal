@@ -38,11 +38,13 @@ def dashboard():
     )
 
     score = user_score(current_user)
+    total_possible = sum(c.points for c in challenges)
     return render_template(
         "dashboard.html",
         challenges=challenges,
         solved_ids=solved_ids,
         score=score,
+        total_possible=total_possible,
     )
 
 

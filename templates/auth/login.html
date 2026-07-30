@@ -3,7 +3,10 @@
 <div class="auth-page">
   <div class="auth-inner">
     {% if logo_filename %}
-    <img src="{{ url_for('logo') }}" alt="Portal logo" class="auth-logo">
+    <img src="{{ url_for('logo') }}" alt="Portal logo" class="auth-logo{{ ' theme-logo-dark' if logo_dark_available }}">
+    {% endif %}
+    {% if logo_dark_available %}
+    <img src="{{ url_for('logo_dark') }}" alt="Portal logo" class="auth-logo theme-logo-light">
     {% endif %}
     <div class="auth-card card">
     <h2>Login</h2>

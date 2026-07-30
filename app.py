@@ -42,10 +42,12 @@ def create_app():
     @app.context_processor
     def inject_helpers():
         logo_filename = get_setting("logo_filename", "")
+        logo_dark_path = os.path.join(app.root_path, "data", "logo-dark.png")
         return {
             "get_setting": get_setting,
             "user_score": user_score,
             "logo_filename": logo_filename,
+            "logo_dark_available": os.path.exists(logo_dark_path),
         }
 
     @app.route("/logo")
@@ -58,6 +60,16 @@ def create_app():
             abort(404)
         data_dir = os.path.join(app.root_path, "data")
         return send_from_directory(data_dir, filename)
+
+    @app.route("/logo-dark")
+    def logo_dark():
+        """Serve the light-mode (dark-colored) logo variant, if present."""
+        from flask import send_from_directory
+
+        data_dir = os.path.join(app.root_path, "data")
+        if not os.path.exists(os.path.join(data_dir, "logo-dark.png")):
+            abort(404)
+        return send_from_directory(data_dir, "logo-dark.png")
 
     # Register blueprints
     from blueprints.auth import auth_bp

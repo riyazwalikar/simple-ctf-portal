@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ get_setting('portal_title', 'Exam and CTF Portal') }}</title>
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("theme");
+        document.documentElement.setAttribute("data-theme", stored === "light" ? "light" : "dark");
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -30,7 +38,10 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="nav-link btn-link">Logout</button>
         </form>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">🌙</button>
       </nav>
+      {% else %}
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">🌙</button>
       {% endif %}
     </div>
   </header>
