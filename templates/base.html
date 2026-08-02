@@ -31,6 +31,9 @@
         <span class="score-chip" id="score-chip">{{ user_score(current_user) }} pts</span>
         {% endif %}
         <a href="{{ url_for('student.dashboard') }}" class="nav-link">Dashboard</a>
+        {% if get_setting('scoreboard_enabled', 'false') == 'true' %}
+        <a href="{{ url_for('student.scoreboard') }}" class="nav-link">Scoreboard</a>
+        {% endif %}
         {% if current_user.role == 'admin' %}
         <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a>
         {% endif %}
