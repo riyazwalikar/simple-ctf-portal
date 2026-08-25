@@ -7,15 +7,33 @@ Self-contained flag-submission portal for hands-on security exams and CTFs. Stud
 ## Quick Start
 
 ```bash
-python -m venv venv && source venv/bin/activate
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 # Edit .env — set SECRET_KEY and ADMIN_PASSWORD
-python seed.py
-python app.py
+python3 seed.py
+python3 app.py
 ```
 
 App serves on `0.0.0.0:5000` (set `PORT` env to override).
+
+## Screenshots
+
+Login:
+
+![Login](images/login.png)
+
+Student dashboard:
+
+![Dashboard](images/dashboard.png)
+
+Admin settings:
+
+![Admin settings](images/admin-settings.png)
+
+Admin settings configuration:
+
+![Admin settings configuration](images/admin-settings-configuration.png)
 
 ## Deploying (Railway, etc.)
 
