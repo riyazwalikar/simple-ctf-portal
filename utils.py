@@ -37,22 +37,29 @@ def save_logo(file_storage, data_dir):
     ext = sniff_logo_ext(head)
     if ext is None:
         raise ValueError("Logo must be a PNG, JPEG, GIF, or WebP image.")
-    # Remove old logos (any allowed extension)
+    # Remove old logos (any allowed extension) and the light-mode variant,
+    # which would otherwise keep showing the previous logo in light theme.
     for old_ext in (".png", ".jpg", ".gif", ".webp"):
         old = os.path.join(data_dir, f"logo{old_ext}")
         if os.path.exists(old):
             os.remove(old)
+    old_dark = os.path.join(data_dir, "logo-dark.png")
+    if os.path.exists(old_dark):
+        os.remove(old_dark)
     filename = f"logo{ext}"
     file_storage.save(os.path.join(data_dir, filename))
     return filename
 
 
 def remove_logo(data_dir):
-    """Delete any stored logo file."""
+    """Delete any stored logo file, including the light-mode variant."""
     for ext in (".png", ".jpg", ".gif", ".webp"):
         path = os.path.join(data_dir, f"logo{ext}")
         if os.path.exists(path):
             os.remove(path)
+    dark_path = os.path.join(data_dir, "logo-dark.png")
+    if os.path.exists(dark_path):
+        os.remove(dark_path)
 
 
 def admin_required(f):
