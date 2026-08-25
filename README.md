@@ -41,6 +41,24 @@ Admin settings configuration:
 - **First boot auto-seeds**: if no admin user exists, the app creates the admin (from env), default settings, and sample challenges automatically. `python seed.py` is only needed locally.
 - **SQLite is ephemeral in containers.** Without a persistent volume, every redeploy/restart wipes the database. On Railway: add a Volume mounted at `/app/data` (the default `DATABASE_URL` resolves there). Change `DATABASE_URL` if your mount path differs.
 
+## Docker
+
+```bash
+cp .env.example .env
+# Edit .env — set SECRET_KEY and ADMIN_PASSWORD
+docker build -t simple-ctf-portal .
+docker run -d --name ctf-portal \
+  -p 5000:5000 \
+  -v ctf-data:/app/data \
+  --env-file .env \
+  simple-ctf-portal
+```
+
+- `--env-file .env` loads all config from your local `.env` (the app reads the same file via python-dotenv).
+- Named volume `ctf-data` persists the SQLite database across container restarts/redeploys.
+- Admin auto-seeds from the env vars on first boot (no admin exists yet).
+- Set `PORT`/`HOST` in `.env` to override the default `0.0.0.0:5000`.
+
 ## Reset Everything
 
 From the shell:
