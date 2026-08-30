@@ -14,7 +14,7 @@
           <th>Title</th>
           <th>Category</th>
           <th>Points</th>
-          <th>Active</th>
+          <th>Status</th>
           <th>Order</th>
           <th>Actions</th>
         </tr>
@@ -25,7 +25,7 @@
           <td>{{ challenge.title }}</td>
           <td>{{ challenge.category or '-' }}</td>
           <td>{{ challenge.points }}</td>
-          <td>{{ 'Yes' if challenge.is_active else 'No' }}</td>
+          <td>{{ 'Active' if challenge.is_active else 'Disabled' }}</td>
           <td>{{ challenge.sort_order }}</td>
           <td class="actions">
             <a href="{{ url_for('admin.challenge_edit', cid=challenge.id) }}" class="btn btn-sm btn-secondary">Edit</a>
