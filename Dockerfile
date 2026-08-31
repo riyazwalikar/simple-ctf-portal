@@ -7,8 +7,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# SQLite database lives here; mount a volume to persist it across restarts
-VOLUME /app/data
+# SQLite database lives in /app/data; mount a volume there to persist it
+# across restarts (e.g. Railway Volume, or `docker run -v ...:/app/data`).
+# No VOLUME directive: Railway rejects it in Dockerfile builds.
 
 EXPOSE 5000
 CMD ["python", "app.py"]
