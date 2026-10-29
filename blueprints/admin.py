@@ -412,6 +412,7 @@ def scoreboard():
             .filter(
                 Submission.user_id == u.id,
                 Submission.is_correct == True,  # noqa: E712
+                Challenge.is_active == True,  # noqa: E712
             )
             .group_by(Challenge.id)
             .all()

@@ -95,14 +95,19 @@ def set_setting(key, value):
 
 def user_score(user):
     """Total points from distinct solved challenges. Points count once per solved
-    challenge regardless of how many times the same flag was submitted."""
+    challenge regardless of how many times the same flag was submitted, and only
+    active challenges count, so a disabled challenge drops out of every score the
+    same way it drops out of the challenge list."""
     solved_challenge_ids = select(Submission.challenge_id).where(
         Submission.user_id == user.id,
         Submission.is_correct == True,  # noqa: E712
     ).distinct()
     result = (
         db.session.query(func.sum(Challenge.points))
-        .filter(Challenge.id.in_(solved_challenge_ids))
+        .filter(
+            Challenge.id.in_(solved_challenge_ids),
+            Challenge.is_active == True,  # noqa: E712
+        )
         .scalar()
     )
     return result or 0
