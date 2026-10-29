@@ -46,6 +46,7 @@ class Submission(db.Model):
     challenge_id = db.Column(db.Integer, db.ForeignKey("challenges.id"), nullable=False)
     submitted_flag = db.Column(db.String(512), nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False)
+    ip_address = db.Column(db.String(45), nullable=True)
     submitted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 

@@ -108,6 +108,23 @@
     });
   });
 
+  // --- Submission detail rows (admin dashboard) ---
+  Array.prototype.forEach.call(document.querySelectorAll(".sub-row"), function (row) {
+    var toggle = function () {
+      var detail = row.nextElementSibling;
+      if (!detail) return;
+      var open = detail.classList.toggle("open");
+      row.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    row.addEventListener("click", toggle);
+    row.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  });
+
   function markSolved(challengeId, newScore) {
     var card = document.getElementById("challenge-" + challengeId);
     if (card) {

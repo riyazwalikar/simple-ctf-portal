@@ -88,6 +88,17 @@ def create_app():
         _os.makedirs(data_dir, exist_ok=True)
         db.create_all()
 
+        # create_all() never alters existing tables: add columns introduced
+        # after a deploy's database was created.
+        from sqlalchemy import inspect, text
+
+        cols = {c["name"] for c in inspect(db.engine).get_columns("submissions")}
+        if "ip_address" not in cols:
+            db.session.execute(
+                text("ALTER TABLE submissions ADD COLUMN ip_address VARCHAR(45)")
+            )
+            db.session.commit()
+
         # First-boot auto-seed: if no admin exists (fresh deploy, seed.py
         # never run), bootstrap admin + settings + sample challenges.
         # Idempotent — seed() skips anything that already exists.

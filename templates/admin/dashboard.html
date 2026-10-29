@@ -25,8 +25,7 @@
     <a href="{{ url_for('admin.settings') }}" class="btn btn-secondary">Settings</a>
   </div>
 
-  <details class="collapsible">
-    <summary><h3>Recent Submissions</h3></summary>
+  <h3>Recent Submissions</h3>
   {% if recent_submissions %}
     <form method="POST" action="{{ url_for('admin.submissions_clear') }}" class="inline-form" onsubmit="return confirm('Delete all submissions? This also empties the scoreboard and cannot be undone.')">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -44,7 +43,7 @@
       </thead>
       <tbody>
         {% for sub in recent_submissions %}
-        <tr>
+        <tr class="sub-row" tabindex="0" role="button" aria-expanded="false">
           <td>{{ sub.user.username }}</td>
           <td>{{ sub.challenge.title }}</td>
           <td>
@@ -54,13 +53,25 @@
           </td>
           <td class="muted">{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M UTC') }}</td>
         </tr>
+        <tr class="sub-detail">
+          <td colspan="4">
+            <dl class="sub-detail-list">
+              <dt>Submitted flag</dt>
+              <dd><code>{{ sub.submitted_flag }}</code></dd>
+              <dt>IP address</dt>
+              <dd>{{ sub.ip_address or 'not recorded' }}</dd>
+              <dt>Timestamp</dt>
+              <dd>{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</dd>
+            </dl>
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <p class="muted hint">Click a row for the submitted flag, source IP and exact time.</p>
   {% else %}
   <p class="muted">No submissions yet.</p>
   {% endif %}
-  </details>
 </div>
 {% endblock %}

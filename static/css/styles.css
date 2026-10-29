@@ -675,6 +675,13 @@ h4 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--muted); }
   .site-main { padding: 0 1rem; margin: 1rem auto; }
 }
 
-.collapsible > summary { cursor: pointer; list-style-position: outside; }
-.collapsible > summary h3 { display: inline; }
+.sub-row { cursor: pointer; }
+.sub-row:hover td, .sub-row:focus-visible td { background: var(--surface-2); }
+/* No-JS keeps details visible; .js hides them until a row is clicked. */
+.js .sub-detail { display: none; }
+.js .sub-detail.open { display: table-row; }
+.sub-detail-list { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; }
+.sub-detail-list dt { color: var(--muted); font-size: 0.8rem; }
+.sub-detail-list dd { margin: 0; word-break: break-all; }
+.hint { font-size: 0.8rem; }
 .header-actions { display: flex; gap: 0.5rem; align-items: center; }

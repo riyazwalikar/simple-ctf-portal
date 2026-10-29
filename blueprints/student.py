@@ -82,6 +82,7 @@ def submit_flag(cid):
             challenge_id=cid,
             submitted_flag=flag,
             is_correct=correct,
+            ip_address=request.remote_addr,
         )
         db.session.add(submission)
         db.session.commit()
@@ -93,6 +94,7 @@ def submit_flag(cid):
         challenge_id=cid,
         submitted_flag=flag,
         is_correct=correct,
+        ip_address=request.remote_addr,
     )
     db.session.add(submission)
     db.session.commit()
