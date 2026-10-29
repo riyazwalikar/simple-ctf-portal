@@ -131,6 +131,17 @@ def dashboard():
     )
 
 
+@admin_bp.route("/submissions/clear", methods=["POST"])
+@admin_required
+def submissions_clear():
+    """Delete every submission (also empties the scoreboard, which is derived
+    from correct submissions)."""
+    deleted = Submission.query.delete()
+    db.session.commit()
+    flash(f"{deleted} submission(s) cleared.", "success")
+    return redirect(url_for("admin.dashboard"))
+
+
 # ---------------------------------------------------------------------------
 # Challenges
 # ---------------------------------------------------------------------------
@@ -305,6 +316,25 @@ def user_delete(uid):
     return redirect(url_for("admin.users"))
 
 
+@admin_bp.route("/users/bulk-delete", methods=["POST"])
+@admin_required
+def users_bulk_delete():
+    ids = [int(i) for i in request.form.getlist("user_ids") if i.isdigit()]
+    ids = [i for i in ids if i != current_user.id]
+    if not ids:
+        flash("No users selected.", "error")
+        return redirect(url_for("admin.users"))
+
+    # Remove dependent submissions first (no FK cascade in SQLite by default)
+    Submission.query.filter(Submission.user_id.in_(ids)).delete(
+        synchronize_session=False
+    )
+    deleted = User.query.filter(User.id.in_(ids)).delete(synchronize_session=False)
+    db.session.commit()
+    flash(f"{deleted} user(s) deleted.", "success")
+    return redirect(url_for("admin.users"))
+
+
 # ---------------------------------------------------------------------------
 # Settings
 # ---------------------------------------------------------------------------
@@ -417,6 +447,17 @@ def scoreboard():
         selected_category=selected_category,
         sort=sort,
     )
+
+
+@admin_bp.route("/scoreboard/clear", methods=["POST"])
+@admin_required
+def scoreboard_clear():
+    """Scores are derived from correct submissions, so clearing the scoreboard
+    deletes those; incorrect attempts stay in the submission log."""
+    deleted = Submission.query.filter_by(is_correct=True).delete()
+    db.session.commit()
+    flash(f"Scoreboard cleared ({deleted} solve(s) removed).", "success")
+    return redirect(url_for("admin.scoreboard"))
 
 
 # ---------------------------------------------------------------------------

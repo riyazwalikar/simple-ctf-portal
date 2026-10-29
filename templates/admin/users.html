@@ -3,7 +3,13 @@
 <div class="admin-page">
   <div class="admin-header">
     <h2>Users</h2>
-    <a href="{{ url_for('admin.user_new') }}" class="btn btn-primary">New User</a>
+    <div class="header-actions">
+      <form method="POST" id="bulk-delete-form" action="{{ url_for('admin.users_bulk_delete') }}" class="inline-form" onsubmit="return confirm('Delete all selected users? This cannot be undone.')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger">Delete Selected</button>
+      </form>
+      <a href="{{ url_for('admin.user_new') }}" class="btn btn-primary">New User</a>
+    </div>
   </div>
 
   {% if users %}
@@ -11,6 +17,7 @@
     <table class="table">
       <thead>
         <tr>
+          <th><input type="checkbox" aria-label="Select all users" onclick="document.querySelectorAll('.user-select').forEach(c => c.checked = this.checked)"></th>
           <th>Username</th>
           <th>Display Name</th>
           <th>Email</th>
@@ -23,6 +30,11 @@
       <tbody>
         {% for user in users %}
         <tr>
+          <td>
+            {% if user.id != current_user.id %}
+            <input type="checkbox" class="user-select" form="bulk-delete-form" name="user_ids" value="{{ user.id }}" aria-label="Select {{ user.username }}">
+            {% endif %}
+          </td>
           <td>{{ user.username }}</td>
           <td>{{ user.display_name or '-' }}</td>
           <td>{{ user.email }}</td>

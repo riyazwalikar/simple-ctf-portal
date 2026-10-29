@@ -674,3 +674,7 @@ h4 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--muted); }
   .flag-input-row { flex-direction: column; }
   .site-main { padding: 0 1rem; margin: 1rem auto; }
 }
+
+.collapsible > summary { cursor: pointer; list-style-position: outside; }
+.collapsible > summary h3 { display: inline; }
+.header-actions { display: flex; gap: 0.5rem; align-items: center; }

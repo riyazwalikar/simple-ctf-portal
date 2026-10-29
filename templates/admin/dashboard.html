@@ -25,8 +25,13 @@
     <a href="{{ url_for('admin.settings') }}" class="btn btn-secondary">Settings</a>
   </div>
 
-  <h3>Recent Submissions</h3>
+  <details class="collapsible">
+    <summary><h3>Recent Submissions</h3></summary>
   {% if recent_submissions %}
+    <form method="POST" action="{{ url_for('admin.submissions_clear') }}" class="inline-form" onsubmit="return confirm('Delete all submissions? This also empties the scoreboard and cannot be undone.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-sm btn-danger">Clear Submissions</button>
+    </form>
   <div class="table-scroll">
     <table class="table">
       <thead>
@@ -56,5 +61,6 @@
   {% else %}
   <p class="muted">No submissions yet.</p>
   {% endif %}
+  </details>
 </div>
 {% endblock %}
